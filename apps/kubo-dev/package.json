@@ -1,0 +1,18 @@
+{
+  "name": "kubo-dev",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-native": "*",
+    "@testing-library/react-native": "*",
+    "react": "*",
+    "react-native": "*",
+    "react-native-svg": "*",
+    "metro-config": "*",
+    "@react-navigation/stack": "*",
+    "@react-navigation/native": "*",
+    "react-native-safe-area-context": "*",
+    "react-native-screens": "*", 
+    "react-native-gesture-handler": "*"
+  }
+}
