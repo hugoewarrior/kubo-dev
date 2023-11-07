@@ -25,7 +25,6 @@ export const CustomSnackBar = (props: SnackBarProps) => {
             }}
             open={open}
             autoHideDuration={hiddeable ? 6000 : null}
-            onClose={onClose}
             message={message}
             disableWindowBlurListener={true}
         >

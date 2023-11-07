@@ -1,6 +1,5 @@
 import { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext, ICognitoSignResponse, signIn } from '@kubo-dev/kubo-auth'
+import { AuthContext, ICognitoSignResponse } from '@kubo-dev/kubo-auth'
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -13,31 +12,17 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { CustomSnackBar } from '../../../components'
-import { AlertTitleVariants } from '../../../types'
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { CustomSnackBar, Copyright } from '../../../components'
+import { ISnackMessage } from '../../../types'
 import { useNavigateBasedOnRole } from '../../../hooks';
 
 
-
-function Copyright(props: any) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {'Copyright © '}
-            <Link color="inherit" href={"#"}>
-                Bistro
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
-
-
-interface ISnackMessage {
-    message: string | null,
-    snackType: AlertTitleVariants
-}
-
+const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+};
 
 export const LoginPage = () => {
 
@@ -46,10 +31,9 @@ export const LoginPage = () => {
 
     const [snack, setSnack] = useState(
         {
-            message: null,
-            snackType: "info"
-        } as ISnackMessage
-    );
+            snackType: "info",
+            message: null
+        } as ISnackMessage);
 
     const [loginForm, setloginForm] = useState({
         Username: '',
@@ -71,20 +55,21 @@ export const LoginPage = () => {
     }
 
 
-    const submitForm = async () => {
-
+    /**
+     * Submits the login form and navigates to the appropriate page based on the user's role.
+     * @returns {Promise<void>}
+     */
+    const submitForm = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         try {
+            e.preventDefault();
             const resp: ICognitoSignResponse = await login(
                 loginForm.Username,
                 loginForm.Password);
             naviageByRole(resp);
         } catch (e) {
-            console.log("error", e)
-            setSnack((l) => ({ ...l, message: String(e), snack_type: "error" }))
-
+            console.error("error", e)
+            setSnack((l) => ({ ...l, message: String(e), snackType: "error" }))
         }
-
-
     }
 
 
@@ -130,10 +115,24 @@ export const LoginPage = () => {
                         fullWidth
                         name="password"
                         label="Password"
-                        type="password"
+                        type={showPW ? "text" : "password"}
                         id="password"
                         autoComplete="current-password"
                         onChange={(e) => updateLocalForm('Password', e.target.value)}
+                        InputProps={{
+                            endAdornment:
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={() => setShowPw((l) => !l)}
+                                        onMouseDown={handleMouseDownPassword}
+                                        edge="end"
+                                    >
+                                        {showPW ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+
+                        }}
                     />
                     <FormControlLabel
                         control={<Checkbox value="remember" color="primary" />}
@@ -142,6 +141,7 @@ export const LoginPage = () => {
                     <Button
                         fullWidth
                         variant="contained"
+                        type='submit'
                         sx={{ mt: 3, mb: 2 }}
                         onClick={submitForm}
                         disabled={loading}
@@ -164,9 +164,9 @@ export const LoginPage = () => {
             </Box>
             <Copyright sx={{ mt: 8, mb: 4 }} />
             <CustomSnackBar
-                message={String(snack.message)}
-                open={Boolean(snack.message)}
-                variant={snack.snackType}
+                message={String(snack?.message)}
+                open={Boolean(snack?.message)}
+                variant={snack?.snackType}
                 onClose={() => setSnack((l) => { return { ...l, message: null } })}
                 hiddeable={false}
             />
