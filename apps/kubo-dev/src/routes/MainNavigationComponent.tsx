@@ -4,33 +4,43 @@ import {
     createStackNavigator,
 } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+
 import { HomeScreen } from '../screens/Home';
+import { Login } from '../screens/Authentication';
+import AuthMiddleware from '../screens/Authentication/components/AuthMiddleware';
 
 
 const { Navigator, Screen } = createStackNavigator();
 
 export const MainNavigationComponent = () => {
     return (
-        <SafeAreaProvider>
-            <NavigationContainer>
-                <Navigator
-                    initialRouteName="Home"
-                    screenOptions={({ navigation }) => ({
-                        //detachPreviousScreen: !navigation.isFocused(),
-                        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-                        headerShadowVisible: true,
-                        gestureEnabled: false,
-                    })}
-                >
-                    <Screen
-                        name="Home"
-                        component={HomeScreen}
-                        options={{ title: 'Home' }}
-                    />
-                </Navigator>
-            </NavigationContainer>
-        </SafeAreaProvider>
+
+        <NavigationContainer>
+            <Navigator
+                initialRouteName="AuthMiddleware"
+                screenOptions={({ navigation }) => ({
+                    //detachPreviousScreen: !navigation.isFocused(),
+                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                    headerShadowVisible: true,
+                    headerShown: false,
+                    gestureEnabled: false,
+                })}
+            >
+                <Screen
+                    name="Home"
+                    component={HomeScreen}
+                />
+                <Screen
+                    name="AuthMiddleware"
+                    component={AuthMiddleware}
+                />
+                <Screen
+                    name="Login"
+                    component={Login}
+                />
+            </Navigator>
+        </NavigationContainer>
+
     );
 }
 export default MainNavigationComponent
