@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import { confirmSignUp, getUserInformation, resendConfirmationCode, signIn, signOut, signUp } from "../../functions";
-import { ConfirmSignUpParameters, ResendConfCodeParameters, SignUpParameters } from "../../types";
+import { ConfirmSignUpParameters, ICognitoSignResponse, ResendConfCodeParameters, SignUpParameters } from "../../types";
+import { CHALLENGE_OPTS } from "../../constants";
 import { AuthContext } from "./AuthContext"
 
 
@@ -33,7 +34,15 @@ export const AuthProvider = ({ children }: IAuthProvider) => {
     const login = async (username: string, password: string) => await signIn({
         username,
         password,
-    }).then((u) => setUser(u)).catch((e) => e);
+    }).then((u) => {
+        console.log(u)
+        if ((u as ICognitoSignResponse).challengeName === CHALLENGE_OPTS.NEW_PASSWORD_REQUIRED) {
+            return u;
+        }
+        else {
+            setUser(u)
+        }
+    }).catch((e) => e);
 
     /**
      * Logs out the user by calling the signOut function.

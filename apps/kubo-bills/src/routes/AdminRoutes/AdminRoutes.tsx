@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom"
-import { ADMIN_PREFIX, ADMIN_ROUTES } from "../route-values"
-import { Home } from "../../pages/admin/home"
+import { returnStringRoute } from "@kubo-dev/kubo-auth"
+import { ADMIN_PREFIX, ADMIN_ROUTES, AUTH_PREFIX, AUTH_ROUTES } from "../route-values"
+import { Home } from "../../pages/Admin/Home"
 
 interface IAdminRoutes {
     isAuthenticated: boolean
@@ -21,7 +22,7 @@ export const AdminRoutes = ({ isAuthenticated }: IAdminRoutes) => {
                     <Route
                         key={key + "-" + row.route}
                         path={row.route}
-                        element={isAuthenticated ? row.Component : <Navigate replace to={"/auth/login"} />} />
+                        element={isAuthenticated ? row.Component : <Navigate replace to={returnStringRoute(AUTH_PREFIX, AUTH_ROUTES.LOGIN)} />} />
                 ))}
             </Route>
 

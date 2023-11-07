@@ -6,7 +6,7 @@
     "ios": "nx run kubo-dev:run-ios",
     "pod-install": "nx run kubo-dev:pod-install",
     "android": "nx run kubo-dev:run-android",
-    "start:kubo-bills": "nx run kubo-bills:serve", 
+    "start:kubo-bills": "nx run kubo-bills:serve",
     "build:all": "nx run-many --target=build --all",
     "build:kubo-bills": "nx run kubo-bills:build"
   },
@@ -23,6 +23,7 @@
     "@swc/helpers": "~0.5.0",
     "amazon-cognito-identity-js": "^6.3.5",
     "aws-amplify": "^5.3.10",
+    "date-fns": "^2.30.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.71.10",

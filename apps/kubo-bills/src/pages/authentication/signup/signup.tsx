@@ -12,27 +12,14 @@ import Typography from '@mui/material/Typography';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Container, FormControl, IconButton, InputLabel, OutlinedInput } from '@mui/material';
-//import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
-//import { CognitoUserAttribute } from "amazon-cognito-identity-js";
 import InputAdornment from '@mui/material/InputAdornment';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import moment from 'moment';
+import { returnStringRoute } from '@kubo-dev/kubo-auth';
+import { AUTH_PREFIX, AUTH_ROUTES } from '../../../routes';
+import { Copyright } from '../../../components';
 
-
-
-function Copyright(props: any) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
-                Your Website
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
 
 
 export const SignUp = () => {
@@ -201,7 +188,7 @@ export const SignUp = () => {
                     </Button>
                     <Grid container justifyContent="flex-end">
                         <Grid item>
-                            <Link href={"#"} variant="body2">
+                            <Link href={"#" + returnStringRoute(AUTH_PREFIX, AUTH_ROUTES.LOGIN)} variant="body2">
                                 Already have an account? Sign in
                             </Link>
                         </Grid>

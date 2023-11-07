@@ -1,5 +1,6 @@
 import { Amplify } from 'aws-amplify';
 import { AuthProvider } from '@kubo-dev/kubo-auth';
+import { FormValidatorProvider } from '@kubo-dev/form-validator'
 import AppRoutes from "../routes/MainNavigation";
 
 const cognitoAuthConfig = {
@@ -15,9 +16,11 @@ Amplify.configure({
 
 export function App() {
   return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
+    <FormValidatorProvider>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </FormValidatorProvider>
   );
 }
 

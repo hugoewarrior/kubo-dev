@@ -1,5 +1,6 @@
 import { useContext, useState } from 'react';
-import { AuthContext, ICognitoSignResponse } from '@kubo-dev/kubo-auth'
+import { useNavigate } from 'react-router-dom';
+import { AuthContext, CHALLENGE_OPTS, returnStringRoute } from '@kubo-dev/kubo-auth'
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -18,6 +19,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { CustomSnackBar, Copyright } from '../../../components'
 import { ISnackMessage } from '../../../types'
 import { useNavigateBasedOnRole } from '../../../hooks';
+import { AUTH_PREFIX, AUTH_ROUTES } from '../../../routes';
 
 
 const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -27,7 +29,8 @@ const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => 
 export const LoginPage = () => {
 
     const { login, loading } = useContext(AuthContext);
-    const { naviageByRole } = useNavigateBasedOnRole()
+    const { naviageByRole } = useNavigateBasedOnRole();
+    const navigate = useNavigate();
 
     const [snack, setSnack] = useState(
         {
@@ -35,12 +38,12 @@ export const LoginPage = () => {
             message: null
         } as ISnackMessage);
 
-    const [loginForm, setloginForm] = useState({
+    const [loginForm, setLoginForm] = useState({
         Username: '',
         Password: ''
     });
 
-    const [showPW, setShowPw] = useState(false);
+    const [showPW, setShowPW] = useState(false);
 
 
     /**
@@ -49,7 +52,7 @@ export const LoginPage = () => {
      * @param value 
      */
     const updateLocalForm = (prop_name: string, value: string) => {
-        setloginForm((l) => {
+        setLoginForm((l) => {
             return { ...l, [prop_name]: value }
         })
     }
@@ -62,14 +65,32 @@ export const LoginPage = () => {
     const submitForm = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         try {
             e.preventDefault();
-            const resp: ICognitoSignResponse = await login(
+            const resp = await login(
                 loginForm.Username,
-                loginForm.Password);
-            naviageByRole(resp);
+                loginForm.Password
+            )
+            if (resp.challengeName === CHALLENGE_OPTS.NEW_PASSWORD_REQUIRED) {
+                navigate(returnStringRoute(AUTH_PREFIX, AUTH_ROUTES.RECOVERY), { state: { origin: loginForm.Username } })
+            }
+            else {
+                naviageByRole(resp)
+            }
         } catch (e) {
             console.error("error", e)
             setSnack((l) => ({ ...l, message: String(e), snackType: "error" }))
         }
+    }
+
+
+
+    /**
+     * Validates the submit status of the login form.
+     * @returns {boolean} - Returns true if the login form is valid, otherwise false.
+     */
+    const validateSubmitStatus = () => {
+        let valid = true;
+        if (!loginForm.Password || !loginForm.Username) valid = false;
+        return valid
     }
 
 
@@ -124,7 +145,7 @@ export const LoginPage = () => {
                                 <InputAdornment position="end">
                                     <IconButton
                                         aria-label="toggle password visibility"
-                                        onClick={() => setShowPw((l) => !l)}
+                                        onClick={() => setShowPW((l) => !l)}
                                         onMouseDown={handleMouseDownPassword}
                                         edge="end"
                                     >
@@ -144,18 +165,18 @@ export const LoginPage = () => {
                         type='submit'
                         sx={{ mt: 3, mb: 2 }}
                         onClick={submitForm}
-                        disabled={loading}
+                        disabled={loading || !validateSubmitStatus()}
                     >
                         {loading ? "Loading..." : "Log In"}
                     </Button>
                     <Grid container>
                         <Grid item xs>
-                            <Link href={"#"} variant="body2">
+                            <Link href={"#" + returnStringRoute(AUTH_PREFIX, AUTH_ROUTES.FORGOT)} variant="body2">
                                 Forgot password?
                             </Link>
                         </Grid>
                         <Grid item>
-                            <Link href={"#"} variant="body2">
+                            <Link href={"#" + returnStringRoute(AUTH_PREFIX, AUTH_ROUTES.SIGNUP)} variant="body2">
                                 {"Don't have an account? Sign Up"}
                             </Link>
                         </Grid>

@@ -36,6 +36,7 @@ export interface ICognitoSignResponse {
     client: any
     signInUserSession: any
     username: any
+    challengeName?: any
 }
 
 

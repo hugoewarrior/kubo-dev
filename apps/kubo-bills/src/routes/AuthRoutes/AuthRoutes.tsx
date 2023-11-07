@@ -1,10 +1,11 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import { AUTH_PREFIX, AUTH_ROUTES } from "../route-values";
+import { returnStringRoute } from "@kubo-dev/kubo-auth";
+import { ADMIN_PREFIX, ADMIN_ROUTES, AUTH_PREFIX, AUTH_ROUTES } from "../route-values";
 import {
-    ConfirmationPage, ForgotPasswordResetComponent,
-    LoginPage, RecoverEmailSenderComponent,
+    ConfirmationPage, ForgotPasswordPage,
+    LoginPage, RecoverEmailSender,
     SignUp
-} from "../../pages/authentication";
+} from "../../pages/Authentication";
 
 interface IAuthRoutes {
     isAuthenticated: boolean
@@ -13,8 +14,8 @@ interface IAuthRoutes {
 const PROTECTED_ROUTES = [
     { route: AUTH_ROUTES.LOGIN, Component: <LoginPage /> },
     { route: AUTH_ROUTES.CONFIRMATION, Component: <ConfirmationPage /> },
-    { route: AUTH_ROUTES.FORGOT, Component: <ForgotPasswordResetComponent /> },
-    { route: AUTH_ROUTES.RECOVERY, Component: <RecoverEmailSenderComponent /> },
+    { route: AUTH_ROUTES.FORGOT, Component: <ForgotPasswordPage /> },
+    { route: AUTH_ROUTES.RECOVERY, Component: <RecoverEmailSender /> },
     { route: AUTH_ROUTES.SIGNUP, Component: <SignUp /> },
 ]
 
@@ -27,7 +28,7 @@ export const AuthRoutes = ({ isAuthenticated }: IAuthRoutes) => {
                     <Route
                         key={key + "-" + row.route}
                         path={row.route}
-                        element={isAuthenticated ? <Navigate replace to={"/admin/home"} /> : row.Component} />
+                        element={isAuthenticated ? <Navigate replace to={returnStringRoute(ADMIN_PREFIX, ADMIN_ROUTES.HOME)} /> : row.Component} />
                 ))}
             </Route>
         </Routes>

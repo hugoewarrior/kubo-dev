@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@kubo-dev/components": ["libs/components/src/index.ts"],
+      "@kubo-dev/form-validator": ["libs/form-validator/src/index.ts"],
       "@kubo-dev/kubo-auth": ["libs/kubo-auth/src/index.ts"]
     }
   },
