@@ -1,0 +1,80 @@
+{
+  "name": "kubo-bills",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/kubo-bills/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "compiler": "babel",
+        "outputPath": "dist/apps/kubo-bills",
+        "index": "apps/kubo-bills/src/index.html",
+        "baseHref": "/",
+        "main": "apps/kubo-bills/src/main.tsx",
+        "tsConfig": "apps/kubo-bills/tsconfig.app.json",
+        "assets": [      
+          "apps/kubo-bills/src/assets"
+        ],
+        "scripts": [],
+        "isolatedConfig": true,
+        "webpackConfig": "apps/kubo-bills/webpack.config.js"
+      },
+      "configurations": {
+        "development": {
+          "extractLicenses": false,
+          "optimization": false,
+          "sourceMap": true,
+          "vendorChunk": true
+        },
+        "production": {
+          "fileReplacements": [
+            {
+              "replace": "apps/kubo-bills/src/environments/environment.ts",
+              "with": "apps/kubo-bills/src/environments/environment.prod.ts"
+            }
+          ],
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/webpack:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "kubo-bills:build",
+        "hmr": true
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "kubo-bills:build:development"
+        },
+        "production": {
+          "buildTarget": "kubo-bills:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/kubo-bills/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "serve-static": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "kubo-bills:build"
+      }
+    }
+  },
+  "tags": []
+}

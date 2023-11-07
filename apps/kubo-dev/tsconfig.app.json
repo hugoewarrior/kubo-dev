@@ -10,5 +10,12 @@
     "src/**/*.spec.tsx",
     "test-setup.ts"
   ],
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "../../libs/components/src/index.ts",
+    "../../libs/kubo-auth/src/index.ts",
+  ]
 }

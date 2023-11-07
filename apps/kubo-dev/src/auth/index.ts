@@ -1,0 +1,1 @@
+export { cognitoAuthConfig } from './config/amplify-config';

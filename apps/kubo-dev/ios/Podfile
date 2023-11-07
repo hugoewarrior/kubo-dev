@@ -21,6 +21,11 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
+ENVFILES = {
+  'Release' => '$(PODS_ROOT)/../../.env',
+  'Debug' => '$(PODS_ROOT)/../../.env.local',
+}
+
 target 'KuboDev' do
   config = use_native_modules!
 

@@ -1,0 +1,1 @@
+export type AlertTitleVariants = 'success' | 'info' | 'warning' | 'error'
