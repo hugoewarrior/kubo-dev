@@ -7,7 +7,7 @@ export const text_error_types = [
     { error_id: 1, field_type: "short_text", message: "Text is too long, maximun of 45 characters" },
     { error_id: 2, field_type: "text", message: "Field must not be empty" },
     { error_id: 3, field_type: "email", message: "Incorrect Format, it must be: example@email.com" },
-    { error_id: 4, field_type: "verf_code", message: "Code must be equal or greater than 9 characters" },
+    { error_id: 4, field_type: "verf_code", message: "Invalid Code" },
 ];
 
 /**

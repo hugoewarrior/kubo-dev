@@ -1,8 +1,17 @@
 import { useEffect, useState } from "react";
-import { confirmSignUp, getUserInformation, resendConfirmationCode, signIn, signOut, signUp } from "../../functions";
-import { ConfirmSignUpParameters, ICognitoSignResponse, ResendConfCodeParameters, SignUpParameters } from "../../types";
+import {
+    confirmSignUp, forgotPassword, forgotPasswordSubmit,
+    getUserInformation, resendConfirmationCode, signIn,
+    signOut, signUp, changePassword
+} from "../../functions";
+import {
+    ChangePasswordIndependent, ConfirmSignUpParameters,
+    ForgotPasswordProcess, ICognitoSignResponse,
+    ResendConfCodeParameters, SignUpParameters
+} from "../../types";
 import { CHALLENGE_OPTS } from "../../constants";
 import { AuthContext } from "./AuthContext"
+
 
 
 interface IAuthProvider {
@@ -82,6 +91,30 @@ export const AuthProvider = ({ children }: IAuthProvider) => {
      */
     const confirmRegister = async ({ username, code }: ConfirmSignUpParameters) => await confirmSignUp({ username, code });
 
+    /**
+     * Calls the forgotPassword function with the provided username.
+     * @param username - The username of the user who forgot their password.
+     * @returns A promise that resolves when the forgotPassword function is called.
+     */
+    const forgotPasswordInit = async (username: string) => await forgotPassword(username);
+
+
+    /**
+     * Submits a new password for a forgotten password flow.
+     * @param {ForgotPasswordProcess} params - The parameters for the forgot password process.
+     * @returns {Promise<void>} - A promise that resolves when the new password is submitted successfully.
+     */
+    const forgotPasswordProccess = async ({ username, code, newPassword }: ForgotPasswordProcess) => await forgotPasswordSubmit(username, code, newPassword);
+
+
+    /**
+     * Changes the password for an individual user.
+     * @param {ChangePasswordIndependent} - An object containing the old and new passwords.
+     * @returns {Promise<void>} - A promise that resolves when the password has been changed.
+     */
+    const changePasswordIndividualFlow = async ({ oldPassword, newPassword, user }: ChangePasswordIndependent) => changePassword(oldPassword, newPassword, user)
+
+
 
     return (
         <AuthContext.Provider
@@ -89,7 +122,10 @@ export const AuthProvider = ({ children }: IAuthProvider) => {
                 user, loading, login,
                 logout, register,
                 resendSignUpCode,
-                getUserInfo, confirmRegister
+                getUserInfo, confirmRegister,
+                forgotPasswordInit,
+                forgotPasswordProccess,
+                changePasswordIndividualFlow
             }}>
             {children}
         </AuthContext.Provider>

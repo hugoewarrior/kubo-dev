@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createContext } from "react";
 import { ISignUpResult } from "amazon-cognito-identity-js";
-import { ICognitoSignResponse, SignUpParameters } from "../../types";
+import { ChangePasswordIndependent, ForgotPasswordProcess, ICognitoSignResponse, SignUpParameters } from "../../types";
 
 interface AuthContextProps {
     user?: object
@@ -12,6 +12,9 @@ interface AuthContextProps {
     resendSignUpCode: (e: { username: string }) => Promise<any>
     getUserInfo: () => Promise<null | object>
     confirmRegister: (e: { username: string, code: string }) => Promise<any>
+    forgotPasswordInit: (e: string) => Promise<any>
+    forgotPasswordProccess: (e: ForgotPasswordProcess) => Promise<any>
+    changePasswordIndividualFlow: (e: ChangePasswordIndependent) => Promise<any>
 }
 
 const initialState: any = {}

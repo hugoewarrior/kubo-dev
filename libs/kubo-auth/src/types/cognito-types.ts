@@ -29,6 +29,19 @@ export type SignInParameters = {
 };
 
 
+export type ForgotPasswordProcess = {
+    username: string;
+    code: string;
+    newPassword: string;
+}
+
+export type ChangePasswordIndependent = {
+    oldPassword: string;
+    newPassword: string;
+    user?: ICognitoSignResponse
+}
+
+
 export interface ICognitoSignResponse {
     Session: string,
     attributes: ICognitoUserAttributes
@@ -37,6 +50,13 @@ export interface ICognitoSignResponse {
     signInUserSession: any
     username: any
     challengeName?: any
+}
+
+
+export interface ICodeDeliveryDetails {
+    AttributeName: string
+    DeliveryMedium: string
+    Destination: string
 }
 
 

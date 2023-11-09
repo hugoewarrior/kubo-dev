@@ -5,6 +5,7 @@ export enum AUTH_ROUTES {
     LOGIN = `login`,
     CONFIRMATION = `confirmation`,
     FORGOT = `forgot`,
+    FORGOT_RESET = `forgot/reset`,
     RECOVERY = `recovery`,
     SIGNUP = `signup`,
 }

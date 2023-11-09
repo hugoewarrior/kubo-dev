@@ -3,14 +3,15 @@
  * update the password
  */
 import { useCallback, useContext, useEffect, useState } from 'react';
+
 import { Box, Button, Container, CssBaseline, Divider, Grid, Link, TextField, Typography } from '@mui/material';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { FormValidatorContext } from '@kubo-dev/form-validator';
-import { AuthContext, ICognitoSignResponse, isError, returnStringRoute } from '@kubo-dev/kubo-auth';
-import { CustomSnackBar } from '../../../components'
-import { ISnackMessage } from '../../../types'
-import { AUTH_PREFIX, AUTH_ROUTES } from '../../../routes';
-import { useNavigateBasedOnRole } from '../../../hooks';
+import { AuthContext, ICodeDeliveryDetails, isError, returnStringRoute } from '@kubo-dev/kubo-auth';
+import { CustomSnackBar, WrongOperationComponent } from '../../../../components'
+import { ISnackMessage } from '../../../../types'
+import { AUTH_PREFIX, AUTH_ROUTES } from '../../../../routes';
+import { useNavigateBasedOnRole } from '../../../../hooks';
 
 
 interface IResetPasswordForm {
@@ -20,25 +21,22 @@ interface IResetPasswordForm {
     newPassword2: string
 }
 
-type RecoverEmailSenderNavState = {
-    username: string
-    data: string //User Login Data comes stringify from login form
-    oldPassword: string
+type IOrigin = {
+    CodeDeliveryDetails: ICodeDeliveryDetails
 }
 
-export const RecoverEmailSender = () => {
+type ResetPasswordNavState = {
+    origin: IOrigin
+    username: string
+}
 
-    const navigate = useNavigate();
+export const NewPasswordInputForm = () => {
+
     const location = useLocation();
     const formValidator = useContext(FormValidatorContext);
     const { naviageByRole } = useNavigateBasedOnRole();
-    const { changePasswordIndividualFlow, login } = useContext(AuthContext);
-    const [passwordConfirm, setPasswordConfirm] = useState(false);
+    const { forgotPasswordProccess, login } = useContext(AuthContext);
     const [loadedComponent, setLoadedComponent] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [userSignInData, setUserSignInData] = useState({} as ICognitoSignResponse)
-    const [oldPassword, setOldPassword] = useState('')
-
 
     const [snack, setSnack] = useState(
         {
@@ -46,35 +44,32 @@ export const RecoverEmailSender = () => {
             snackType: "info"
         } as ISnackMessage
     );
-
-    const [resetForm, setResetForm] = useState({
+    const [forgotForm, setForgotForm] = useState({
         username: '',
         newPassword: '',
-        newPassword2: '',
         code: '',
     } as IResetPasswordForm);
-
+    const [passwordConfirm, setPasswordConfirm] = useState(false)
+    const [loading, setLoading] = useState(false as boolean);
+    const [origin, setOrigin] = useState({} as IOrigin);
 
     /**
      * Local functions
      */
 
 
-    const determineOrigin = useCallback((state: RecoverEmailSenderNavState) => {
-        if (state?.username) {
-            updateFormValue('username', state.username);
-            setUserSignInData(state?.data ? JSON.parse(state?.data) : {});
-            setOldPassword(state?.oldPassword)
-        }
-        else updateFormValue('username', '');
+    const determineOrigin = useCallback((state: ResetPasswordNavState) => {
+        setOrigin(state?.origin);
+        updateFormValue("username", state?.username)
     }, [])
 
 
     const validateForm = useCallback(() => {
         formValidator.are_any_errors();
-        formValidator.text_error_validator("newPassword", resetForm.newPassword, [2]);
+        formValidator.text_error_validator("code", forgotForm.code, [2, 4]);
+        formValidator.text_error_validator("newPassword", forgotForm.newPassword, [2]);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [resetForm.newPassword]);
+    }, [forgotForm])
 
 
     /**
@@ -83,32 +78,29 @@ export const RecoverEmailSender = () => {
      * @param value 
      */
     const updateFormValue = (prop_name: string, value: string | null) => {
-        setResetForm((l) => {
+        setForgotForm((l) => {
             return { ...l, [prop_name]: value }
         })
-    }
+    };
 
 
-    const updateUserPassword = async () => {
+
+    const submitForm = async () => {
         setLoading(true);
         try {
-            await changePasswordIndividualFlow({ oldPassword, newPassword: resetForm.newPassword, user: userSignInData });
-            const isAuth = await login(resetForm.username, resetForm.newPassword);
+            console.log(forgotForm)
+            await forgotPasswordProccess({ ...forgotForm });
+            const isAuth = await login(forgotForm.username, forgotForm.newPassword);
             naviageByRole(isAuth)
             setLoading(false);
             console.log(isAuth);
         }
         catch (e) {
-            console.error(e)
+            console.log(e)
             setLoading(false);
             setSnack(() => { return { message: String(e), snackType: "error" } })
         }
     }
-
-
-    /**
-     * 
-     */
 
 
     useEffect(() => {
@@ -117,64 +109,63 @@ export const RecoverEmailSender = () => {
         }
         setLoadedComponent(true)
         return () => {
-            formValidator.clean_object(["newPassword"]);
+            formValidator.clean_object(["code", "newPassword"]);
+            setOrigin({} as IOrigin)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
 
     useEffect(() => {
         loadedComponent && validateForm();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [resetForm])
-
+    }, [forgotForm])
 
     return (
 
         <Container component="main" maxWidth="xs">
             <CssBaseline />
-            <Box
-                sx={{
-                    marginTop: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                }}
-            >
-                {resetForm.username ?
+            {origin?.CodeDeliveryDetails ?
+                <Box
+                    sx={{
+                        marginTop: 8,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}
+                >
                     <>
                         <Typography variant="h5">
-                            Login Success!
+                            Please, verify your email
                         </Typography>
                         <Typography variant="caption">
-                            But first, we need to update your password...
-                        </Typography>
-                    </>
-                    :
-                    <>
-                        <Typography variant="h5">
-                            Ups! Something went wrong
-                        </Typography>
-                        <Typography variant="caption">
-                            We were not able to process this action, to back to
-                            <Link href={"#" + returnStringRoute(AUTH_PREFIX, AUTH_ROUTES.LOGIN)} variant="body2">
-                                {String(" login page")}
-                            </Link> and try again.
+                            We just send you a verification code to: {origin.CodeDeliveryDetails.Destination}
                         </Typography>
                     </>
 
-                }
-
-                {resetForm.username ?
                     <Box component="form" noValidate sx={{ mt: 1 }}>
                         <Divider />
                         <TextField
                             margin="normal"
                             required
                             fullWidth
-                            id="newPassword"
-                            label="Enter New Password"
-                            name="newPassword"
+                            id="code"
+                            label={"Verification code"}
+                            name="code"
                             autoFocus
+                            onChange={(e) => {
+                                updateFormValue('code', e.target.value);
+                            }}
+                            error={isError(formValidator.total_errors, "code")}
+                        />
+
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="newPassword"
+                            label={"Enter New Password"}
+                            name="newPassword"
                             onChange={(e) => {
                                 updateFormValue('newPassword', e.target.value);
                             }}
@@ -184,21 +175,21 @@ export const RecoverEmailSender = () => {
                             margin="normal"
                             required
                             fullWidth
-                            id="newPassword2"
+                            id="newPassword"
                             label="Confirm New Password"
-                            name="newPassword2"
+                            name="newPassword"
                             onChange={(e) => {
-                                setPasswordConfirm(e.target.value === resetForm.newPassword)
+                                setPasswordConfirm(e.target.value === forgotForm.newPassword)
                             }}
                         />
                         <Button
+                            onClick={submitForm}
                             fullWidth
                             variant="contained"
                             sx={{ mt: 3, mb: 2 }}
                             disabled={!passwordConfirm || formValidator.active_errors}
-                            onClick={updateUserPassword}
                         >
-                            {loading ? "Updating password..." : "Update password"}
+                            {loading ? "Changing password..." : "Change password"}
                         </Button>
                         <Grid container>
                             <Grid item xs>
@@ -207,11 +198,11 @@ export const RecoverEmailSender = () => {
                                 </Link>
                             </Grid>
                         </Grid>
-                    </Box> :
-                    null
-                }
+                    </Box>
 
-            </Box >
+                </Box >
+                : <WrongOperationComponent />
+            }
             <CustomSnackBar
                 message={String(snack.message)}
                 open={Boolean(snack.message)}

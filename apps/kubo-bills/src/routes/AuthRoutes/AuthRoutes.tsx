@@ -2,10 +2,11 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { returnStringRoute } from "@kubo-dev/kubo-auth";
 import { ADMIN_PREFIX, ADMIN_ROUTES, AUTH_PREFIX, AUTH_ROUTES } from "../route-values";
 import {
-    ConfirmationPage, ForgotPasswordPage,
+    ConfirmationPage, ForgotPasswordInputForm,
     LoginPage, RecoverEmailSender,
     SignUp
 } from "../../pages/Authentication";
+import { NewPasswordInputForm } from "../../pages/Authentication/ForgotPassword/components/NewPasswordInputForm";
 
 interface IAuthRoutes {
     isAuthenticated: boolean
@@ -14,7 +15,8 @@ interface IAuthRoutes {
 const PROTECTED_ROUTES = [
     { route: AUTH_ROUTES.LOGIN, Component: <LoginPage /> },
     { route: AUTH_ROUTES.CONFIRMATION, Component: <ConfirmationPage /> },
-    { route: AUTH_ROUTES.FORGOT, Component: <ForgotPasswordPage /> },
+    { route: AUTH_ROUTES.FORGOT, Component: <ForgotPasswordInputForm /> },
+    { route: AUTH_ROUTES.FORGOT_RESET, Component: <NewPasswordInputForm /> },
     { route: AUTH_ROUTES.RECOVERY, Component: <RecoverEmailSender /> },
     { route: AUTH_ROUTES.SIGNUP, Component: <SignUp /> },
 ]

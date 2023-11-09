@@ -3,34 +3,37 @@
  * to recover 
  */
 
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
-import { AuthContext, returnStringRoute } from '@kubo-dev/kubo-auth';
+import { AuthContext, isError, returnErrorMessage, returnStringRoute } from '@kubo-dev/kubo-auth';
 import { Avatar, Box, Button, Container, CssBaseline, Divider, Grid, TextField, Typography } from '@mui/material';
-
+import { FormValidatorContext } from '@kubo-dev/form-validator';
 import { CustomSnackBar } from '../../../components';
 import { ISnackMessage } from '../../../types';
 import { AUTH_PREFIX, AUTH_ROUTES } from '../../../routes';
 
 
 interface IForgotPasswordPageForm {
-    Username: string
+    username: string
 }
 
-export const ForgotPasswordPage = () => {
+export const ForgotPasswordInputForm = () => {
 
-    const { resendSignUpCode } = useContext(AuthContext);
+    const { forgotPasswordInit } = useContext(AuthContext);
+    const formValidator = useContext(FormValidatorContext);
+
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false as boolean)
+
     const [snack, setSnack] = useState(
         {
             message: null,
             snackType: "info"
         } as ISnackMessage
     );
-    const [loginForm, setLoginForm] = useState({
-        Username: '',
+    const [forgotForm, setForgotForm] = useState({
+        username: '',
     } as IForgotPasswordPageForm);
 
 
@@ -44,14 +47,20 @@ export const ForgotPasswordPage = () => {
     const submitForm = async () => {
         setLoading(true);
         try {
-            await resendSignUpCode({ username: loginForm.Username })
+            const resp = await forgotPasswordInit(forgotForm.username)
             setLoading(false);
-            navigate(returnStringRoute(AUTH_PREFIX, AUTH_ROUTES.RECOVERY), { state: { origin: loginForm.Username } });
+            navigate(returnStringRoute(AUTH_PREFIX, AUTH_ROUTES.FORGOT_RESET), { state: { origin: resp, username: forgotForm.username } });
         } catch (e) {
             setLoading(false);
             setSnack(() => { return { message: String(e), snackType: "error" } })
         }
     }
+
+    const validateForm = () => {
+        formValidator.are_any_errors();
+        formValidator.text_error_validator("username", forgotForm.username, [2]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    };
 
 
     /**
@@ -60,11 +69,21 @@ export const ForgotPasswordPage = () => {
      * @param value 
      */
     const updateSpecificValue = (prop_name: string, value: string) => {
-        setLoginForm((l) => {
+        setForgotForm((l) => {
             return { ...l, [prop_name]: value }
         })
     }
 
+    useEffect(() => {
+        validateForm();
+        return () => formValidator.clean_object(["username"]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    useEffect(() => {
+        validateForm();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [forgotForm])
 
 
 
@@ -95,14 +114,15 @@ export const ForgotPasswordPage = () => {
                         margin="normal"
                         required
                         fullWidth
-                        id="email"
-                        label="Email or Username"
-                        name="email"
+                        id="username"
+                        label={returnErrorMessage(formValidator.total_errors, "username") ?? "Email or Username"}
+                        name="username"
                         autoComplete="email"
                         autoFocus
                         onChange={(e) => {
-                            updateSpecificValue('Username', e.target.value);
+                            updateSpecificValue('username', e.target.value);
                         }}
+                        error={isError(formValidator.total_errors, "username")}
                     />
                     <Typography variant="caption">
                         Type your email or username
@@ -113,7 +133,7 @@ export const ForgotPasswordPage = () => {
                         onClick={submitForm}
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
-
+                        disabled={formValidator.active_errors}
                     >
                         {loading ? "Sending..." : "Send recovery link"}
                     </Button>

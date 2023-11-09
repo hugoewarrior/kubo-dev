@@ -1,2 +1,2 @@
 export * from './RecoverEmailSender';
-export * from './ForgotPasswordPage';
+export * from '../ForgotPassword/ForgotPasswordInputForm';

@@ -28,10 +28,10 @@ const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => 
 
 export const LoginPage = () => {
 
-    const { login, loading } = useContext(AuthContext);
+    const { login } = useContext(AuthContext);
     const { naviageByRole } = useNavigateBasedOnRole();
     const navigate = useNavigate();
-
+    const [loading, setLoading] = useState(false as boolean);
     const [snack, setSnack] = useState(
         {
             snackType: "info",
@@ -65,18 +65,26 @@ export const LoginPage = () => {
     const submitForm = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         try {
             e.preventDefault();
+            setLoading(true)
             const resp = await login(
                 loginForm.Username,
                 loginForm.Password
             )
-            if (resp.challengeName === CHALLENGE_OPTS.NEW_PASSWORD_REQUIRED) {
-                navigate(returnStringRoute(AUTH_PREFIX, AUTH_ROUTES.RECOVERY), { state: { origin: loginForm.Username } })
+            if (resp?.challengeName === CHALLENGE_OPTS.NEW_PASSWORD_REQUIRED) {
+                navigate(returnStringRoute(AUTH_PREFIX, AUTH_ROUTES.RECOVERY), {
+                    state: {
+                        username: loginForm.Username,
+                        data: JSON.stringify(resp),
+                        oldPassword: loginForm.Password
+                    }
+                })
             }
             else {
                 naviageByRole(resp)
             }
         } catch (e) {
             console.error("error", e)
+            setLoading(false)
             setSnack((l) => ({ ...l, message: String(e), snackType: "error" }))
         }
     }
